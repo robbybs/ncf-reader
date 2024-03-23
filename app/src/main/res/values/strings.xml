@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">NFC Reader</string>
+    <string name="text_cant_read_message">Can\'t read message from the card</string>
+    <string name="text_enable_nfc">Please enable NFC settings.</string>
+    <string name="title_messages">Messages:\u0020</string>
+    <string name="title_serial_number">Serial Number:\u0020</string>
+    <string name="title_save">Save</string>
+    <string name="text_no_data_add">No data will be add</string>
+    <string name="text_delete">Delete</string>
+    <string name="text_send_to_api">Send</string>
+    <string name="text_successfully_send_data">Successfully send data</string>
+</resources>
