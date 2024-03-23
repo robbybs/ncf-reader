@@ -1,34 +1,40 @@
 package com.rbs.nfcreader.data
 
-import android.app.Application
 import androidx.lifecycle.LiveData
-import com.rbs.nfcreader.data.model.Card
 import com.rbs.nfcreader.data.local.CardDao
-import com.rbs.nfcreader.data.local.CardDatabase
-import com.rbs.nfcreader.data.network.ApiConfig
+import com.rbs.nfcreader.data.model.Card
 import com.rbs.nfcreader.data.network.ApiService
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import com.rbs.nfcreader.utils.AppExecutors
 
-class CardRepository(application: Application) {
-    private val cardDao: CardDao
-    private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
-    private val apiService: ApiService = ApiConfig.getService()
-
-    init {
-        val database = CardDatabase.getDatabase(application)
-        cardDao = database.cardDao()
-    }
+class CardRepository(
+    private val apiService: ApiService,
+    private val cardDao: CardDao,
+    private val appExecutors: AppExecutors
+) {
 
     fun getAllData(): LiveData<List<Card>> = cardDao.getAllData()
 
     fun insert(card: Card) {
-        executorService.execute { cardDao.insert(card) }
+        appExecutors.diskIO.execute { cardDao.insert(card) }
     }
 
     fun delete(id: Int) {
-        executorService.execute { cardDao.delete(id) }
+        appExecutors.diskIO.execute { cardDao.delete(id) }
     }
 
-    suspend fun send(serialNumber: String, message: String): Card = apiService.sendCardData(serialNumber, message)
+    suspend fun send(serialNumber: String, message: String): Card =
+        apiService.sendCardData(serialNumber, message)
+
+    companion object {
+        @Volatile
+        private var instance: CardRepository? = null
+        fun getInstance(
+            apiService: ApiService,
+            cardDao: CardDao,
+            appExecutors: AppExecutors
+        ): CardRepository =
+            instance ?: synchronized(this) {
+                instance ?: CardRepository(apiService, cardDao, appExecutors)
+            }.also { instance = it }
+    }
 }

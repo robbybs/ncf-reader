@@ -1,6 +1,5 @@
 package com.rbs.nfcreader.ui
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,8 +7,7 @@ import com.rbs.nfcreader.data.CardRepository
 import com.rbs.nfcreader.data.model.Card
 import kotlinx.coroutines.launch
 
-class CardViewModel(application: Application) : ViewModel() {
-    private val repository: CardRepository = CardRepository(application)
+class CardViewModel(private val repository: CardRepository) : ViewModel() {
 
     fun getAllData(): LiveData<List<Card>> = repository.getAllData()
 

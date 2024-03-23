@@ -24,16 +24,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var intentFilter: Array<IntentFilter>
     private lateinit var cardAdapter: CardAdapter
 
-    private val viewModel: CardViewModel by viewModels {
-        ViewModelFactory(application)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        val factory: ViewModelFactory = ViewModelFactory.getInstance(applicationContext)
+        val viewModel: CardViewModel by viewModels {
+            factory
+        }
+
         setNFC()
         setAdapter()
-        setData()
+        setData(viewModel)
 
         with(binding) {
             btnSave.setOnClickListener {
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setData() {
+    private fun setData(viewModel: CardViewModel) {
         with(viewModel) {
             getAllData().observe(this@MainActivity) {
                 with(cardAdapter) {
